@@ -1,0 +1,25 @@
+#game {
+    text-align: center;
+}
+
+#main {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+}
+
+.red {
+    background-color: red;
+}
+.yellow {
+    background-color: yellow;
+}
+
+.highlighted {
+    color: black;
+    padding: 5px;
+    width: max-content;
+    border-radius: 5px;
+    margin: 1vw auto;
+}
+

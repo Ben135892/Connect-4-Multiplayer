@@ -1,0 +1,40 @@
+#message-div {
+    color: black;
+    border-radius: 5px;
+    padding: 1vw;
+    width: 30%;
+    box-sizing: border-box;
+    background-color: #aaaaaa;
+}
+
+#message-div form {
+    margin: 5px;
+}
+
+#messages {
+    text-align: left;
+    font-size: 1.3vw;
+    max-height: 60vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+#message-div label {
+    font-size: 1.5vw;
+    text-align: center;
+}
+
+#message-div input {
+    border-radius: 1px;
+    border: 1px solid black;
+    width: 70%;
+    margin: 2px;
+    padding: 5px;
+    font-size: 1.1vw;
+}
+
+#message-div button {
+    border: 1px solid black;
+    padding: 0.5vw;
+    margin: 2px;
+}

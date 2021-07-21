@@ -1,0 +1,7 @@
+#start-button {
+    margin-bottom: 1vw;
+    padding: 0.5vw;
+    border: 2px solid blue;
+    border-radius: 5px;
+    background-color: lightgray;
+}
