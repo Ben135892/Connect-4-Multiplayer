@@ -18,7 +18,7 @@ const db = process.env.CONNECTION_STRING;
 mongoose.connect(db, {useNewUrlParser: true, useUnifiedTopology: true})
 .catch(err => console.log(err));
 
-const turnTime = 15; // 15 seconds for each turn
+const turnTime = 10; // how many seconds for each turn
 
 const getPlayers = async (game) => {
     const players = [];
@@ -53,9 +53,7 @@ const leaveGame = async (socket) => {
             const playerArray = [ lastPlayer ];
             
             socket.leave(gameID);
-            io.in(gameID).emit('remove-timer');
-            io.in(gameID).emit('update-game', game);
-            io.in(gameID).emit('update-players', playerArray);
+            io.in(gameID).emit('update-game-and-players', {game, players: playerArray});
             io.in(gameID).emit('message', player.nickName + ' has left!');
             await game.save();
         }     
@@ -76,6 +74,7 @@ io.on('connection', socket => {
             });
             // create room
             const game = new Game({ players: [ player._id ] });
+            game.turnTime = turnTime;
             player.room = game._id;
             await player.save();
             await game.save();
@@ -84,8 +83,7 @@ io.on('connection', socket => {
             const gameID = game._id.toString();
             socket.join(gameID);
 
-            socket.emit('update-game', game);
-            socket.emit('update-players', players);
+            socket.emit('update-game-and-players', {game, players});
             socket.emit('join-game');
         }
         catch(err) {
@@ -125,23 +123,19 @@ io.on('connection', socket => {
             const players = await getPlayers(game);
             socket.join(gameID);
 
-            socket.emit('update-game', game);
-            socket.emit('update-players', players);
+            socket.emit('update-game-and-players', {game, players});
             socket.emit('join-game');
 
             socket.broadcast.to(gameID).emit('message', nickName + ' has joined!');
-            socket.broadcast.to(gameID).emit('update-game', game);
-            socket.broadcast.to(gameID).emit('update-players', players);
+            socket.broadcast.to(gameID).emit('update-game-and-players', {game, players});
         }
         catch(err) {
             console.log(err);
         }
     });
 
-    socket.on('message', async ({ message }) => {
+    socket.on('message', async ({ gameID, message }) => {
         try {
-            const player = await Player.findOne({ socketID: socket.id });
-            const gameID = player.room.toString();
             socket.broadcast.to(gameID).emit('message', message);
         }
         catch(err) {
@@ -149,10 +143,8 @@ io.on('connection', socket => {
         }
     });
 
-    socket.on('start-game', async () => {
+    socket.on('start-game', async ({ gameID }) => {
         try {
-            const player = await Player.findOne({ socketID: socket.id });
-            const gameID = player.room.toString();
             const game = await Game.findById(gameID);
             // update game
             game.hasStarted = true;
@@ -165,20 +157,18 @@ io.on('connection', socket => {
             player2.colour = player1.colour === 'red' ? 'yellow' : 'red';
             await player1.save();
             await player2.save();
+
             const players = [player1, player2];
-            io.in(gameID).emit('update-game', game);
-            io.in(gameID).emit('update-players', players);
-            io.in(gameID).emit('update-timer', turnTime);
             io.in(gameID).emit('restart');
+            io.in(gameID).emit('update-timer', turnTime);
+            io.in(gameID).emit('update-game-and-players', {game, players});
         } catch(err) {
             console.log(err)
         }
     });
 
-    socket.on('update-board', async ({ row, col, colour }) => {
+    socket.on('update-board', async ({ gameID, row, col, colour }) => {
         try {
-            const player = await Player.findOne({ socketID: socket.id });
-            const gameID = player.room.toString();
             socket.broadcast.to(gameID).emit('update-board', { row, col, colour });
         }
         catch(err) {
@@ -186,31 +176,28 @@ io.on('connection', socket => {
         }
     });
 
-    socket.on('change-turn', async () => {
+    socket.on('change-turn', async ({ gameID }) => {
         try {
-            const player = await Player.findOne({ socketID: socket.id });
-            const gameID = player.room.toString();
             const game = await Game.findById(gameID);
             game.turn = game.turn === 'red' ? 'yellow' : 'red';
             await game.save();
             io.in(gameID).emit('update-timer', turnTime);
-            socket.broadcast.to(gameID).emit('update-game', game);
+            // make sure timer is reset for client by emitting game back to client as well
+            io.in(gameID).emit('update-game', game);
         }
         catch(err) {
             console.log(err);
         }
     });
 
-    socket.on('game-over', async ({ result }) => {
+    socket.on('game-over', async ({ gameID, result }) => {
         try {
-            const player = await Player.findOne({ socketID: socket.id });
-            const gameID = player.room.toString();
             const game = await Game.findById(gameID);
             game.hasStarted = false;
             await game.save();
-            io.in(gameID).emit('remove-timer');
-            socket.broadcast.to(gameID).emit('update-game', game);
             socket.broadcast.to(gameID).emit('game-over', result);
+            socket.broadcast.to(gameID).emit('update-game', game);
+            io.in(gameID).emit('remove-timer');
         }
         catch(err) {
             console.log(err);

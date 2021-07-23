@@ -1,17 +1,18 @@
 #board {
-    border-radius: 5px;
+    border-radius: 10px;
     background-color: #04009A;
     display: flex;
     flex-wrap: wrap;
+    width: max-content;
 }
 .col:hover {
     background-color: #77ACF1;
     cursor: pointer;
 }
 .cell {
-    width: 4vw;
-    height: 4vw;
+    width: 3vw;
+    height: 3vw;
     border-radius: 50%;
     background-color: white;
-    margin: 1vw;
+    margin: 0.7vw;
 }

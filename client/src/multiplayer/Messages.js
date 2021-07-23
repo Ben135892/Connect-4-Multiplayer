@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import socket from './socketConfig';
-import './css/Messages.css';
+import '../css/Messages.css';
 
-const Messages = ({ nickName }) => {
+const Messages = ({ gameID, nickName }) => {
     const messagesEndRef = useRef(null);
     const scrollToBottom = () => {
         messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -23,9 +23,9 @@ const Messages = ({ nickName }) => {
         if (input === '')
             return;
         const message = nickName + ': ' + input;
-        setMessages(messages.concat([ message ]));
+        setMessages(messages => messages.concat([ message ]));
         setInput('');
-        socket.emit('message', { message });
+        socket.emit('message', { gameID, message });
     }
     return (
         <div id="message-div">

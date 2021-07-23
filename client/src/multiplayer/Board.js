@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import './css/Board.css';
+import '../css/Board.css';
 import socket from './socketConfig'
+import hasWon from '../hasWon';
+import isDraw from '../isDraw';
 
-const Board = ({ game, setGame, player, setGameOutcome, timer }) => {
-    console.log('rendering board');
+const Board = ({ game, setGame, player, setGameOutcome, timer, setTimer }) => {
     const width = 7;
     const height = 6;
     const generateBoard = () => {
@@ -14,6 +15,7 @@ const Board = ({ game, setGame, player, setGameOutcome, timer }) => {
         return matrix;
     };
     const [board, setBoard] = useState(generateBoard());
+    // run this code once
     useEffect(() => {
         socket.on('restart', () => {
             setGameOutcome(null);
@@ -30,9 +32,10 @@ const Board = ({ game, setGame, player, setGameOutcome, timer }) => {
             socket.off('update-board');
         };
     }, [setGameOutcome]);
+    // runs whenever board is updated/rerendered
     useEffect(() => {
-        if (game.hasStarted && player.colour === game.turn && timer !== null && timer <= 0) {
-            // make random move
+        // if timer has ran out for players turn, make a random move
+        if (game.hasStarted && player.colour === game.turn && timer <= 0) {
             while (true) {
                 let row = height - 1;
                 const column = Math.floor(Math.random() * width);
@@ -46,68 +49,26 @@ const Board = ({ game, setGame, player, setGameOutcome, timer }) => {
             }
         }
     });
-    const isDraw = () => {
-        for (let i = 0; i < width; i++) {
-            for (let j = 0; j < height; j++) {
-                if (board[i][j] === '')
-                    return false;
-            }
-        }
-        return true;
-    }
-    const hasWon = (colour) => {
-        // check columns
-        for (let i = 0; i < width; i++) {
-            for (let j = 0; j <= height - 4; j++) {
-                if (board[i][j] === colour && board[i][j + 1] === colour && board[i][j + 2] === colour && board[i][j + 3] === colour)
-                    return true;
-            }
-        }
-        // check rows
-        for (let j = 0; j < height; j++) {
-            for (let i = 0; i <= width - 4; i++) {
-                if (board[i][j] === colour && board[i + 1][j] === colour && board[i + 2][j] === colour && board[i + 3][j] === colour)
-                    return true;
-            }
-        }
-        // diagonals
-        // right down
-        for (let i = 0; i <= width - 4; i++) {
-            for (let j = 0; j <= height - 4; j++) {
-                if (board[i][j] === colour && board[i + 1][j + 1] === colour && board[i + 2][j + 2] === colour && board[i + 3][j + 3] === colour)
-                    return true;
-            }
-        }
-        // left down
-        for (let i = 3; i < width; i++) {
-            for (let j = 0; j <= height - 4; j++) {
-                if (board[i][j] === colour && board[i - 1][j + 1] === colour && board[i - 2][j + 2] === colour && board[i - 3][j + 3] === colour)
-                    return true;
-            }
-        }
-        return false;
-    }
     const makeMove = (row, colIndex) => {
-        console.log('making move');
         board[colIndex][row] = player.colour;
         setBoard([...board]);
-        socket.emit('update-board', { row, col: colIndex, colour: player.colour });
+        socket.emit('update-board', { gameID: game._id.toString(), row, col: colIndex, colour: player.colour });
         // turn over
-        if (hasWon(player.colour)) {
+        if (hasWon(player.colour, board, width, height)) {
             game.hasStarted = false;
             setGameOutcome('You won!');
-            socket.emit('game-over', { result: 'You lost!' });
-        } else if (isDraw()) {
+            socket.emit('game-over', { gameID: game._id.toString(), result: 'You lost!' });
+        } else if (isDraw(board, width, height)) {
             game.hasStarted = false;
             setGameOutcome('Draw');
-            socket.emit('game-over', { result: 'Draw!' });
+            socket.emit('game-over', { gameID: game._id.toString(), result: 'Draw!' });
         }
         else {
             game.turn = game.turn === 'red' ? 'yellow' : 'red';
-            socket.emit('change-turn');
+            socket.emit('change-turn', { gameID: game._id.toString() });
+            setTimer(game.turnTime);
         }
         setGame({ ...game });
-        console.log('finished move');
     }
     const handleClick = (colIndex) => {
         if (!game.hasStarted || game.turn !== player.colour)

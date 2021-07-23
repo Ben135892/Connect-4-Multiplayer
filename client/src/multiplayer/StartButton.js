@@ -1,12 +1,12 @@
 import socket from './socketConfig';
 import { useState } from 'react';
-import './css/StartButton.css';
+import '../css/StartButton.css';
 
-const StartButton = () => {
+const StartButton = ({ gameID }) => {
     const [clicked, setClicked] = useState(false);
     const startGame = () => {
         setClicked(true);
-        socket.emit('start-game');
+        socket.emit('start-game', { gameID });
     };
     if (clicked)
         return null;

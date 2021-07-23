@@ -1,0 +1,7 @@
+#singleplayer {
+    text-align: center;
+}
+
+#singleplayer #board {
+    margin: auto;
+}

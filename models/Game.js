@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 
 const GameSchema = Schema({
     turn: { type: String },
+    turnTime: { type: Number },
     hasStarted: {
         type: Boolean,
         default: false

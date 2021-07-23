@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import socket from './socketConfig';
-import './css/Form.css'
+import '../css/Form.css'
 
 const JoinGame = () => {
     const [nickName, setNickName] = useState('');
