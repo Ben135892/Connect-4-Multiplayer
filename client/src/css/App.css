@@ -29,10 +29,11 @@ button:hover {
 #link {
     color: blue;
     text-decoration: none;
-    margin: 0;
     border: none;
     background-color: #EBECF0;
     font-size: 1vw;
+    position: absolute;
+    margin: 0;
 }
 
 #link:hover {
