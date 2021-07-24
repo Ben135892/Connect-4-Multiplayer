@@ -4,7 +4,6 @@ import Board from './Board';
 import '../css/SingleplayerGame.css';
 
 const SinglePlayer = ({ difficulty, setDifficulty }) => {
-    console.log(difficulty);
     const [game, setGame] = useState({ hasStarted: false });
     const [yourColour, setYourColour] = useState(null);
     const [aiColour, setAiColour] = useState(null);
