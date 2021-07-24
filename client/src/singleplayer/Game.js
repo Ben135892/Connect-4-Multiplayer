@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import StartButton from './StartButton';
 import Board from './Board';
 import '../css/SingleplayerGame.css';
 
 const SinglePlayer = ({ difficulty, setDifficulty }) => {
-    const history = useHistory();
+    console.log(difficulty);
     const [game, setGame] = useState({ hasStarted: false });
     const [yourColour, setYourColour] = useState(null);
     const [aiColour, setAiColour] = useState(null);
@@ -18,8 +17,7 @@ const SinglePlayer = ({ difficulty, setDifficulty }) => {
             {game.hasStarted && (game.turn === yourColour ? <h2 className={yourColour + ' highlighted'}>Your turn!</h2>
                                                           : <h2 className={aiColour + ' highlighted'}>AI's turn!</h2>)}
             <Board depth={difficulty.depth} game={game} setGame={setGame} playerColour={yourColour} aiColour={aiColour} setGameOutcome={setGameOutcome} />
-            <button onClick={() => setDifficulty(null)}>Change difficulty</button>
-            <button onClick={() => history.replace('/')}>Go back</button>
+            <button id="back" onClick={() => setDifficulty(null)}>Change difficulty</button>
         </div>
     )
 }

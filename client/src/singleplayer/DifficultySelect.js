@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import Game from './Game';
+import '../css/GameMenu.css';
 
 const DifficultySelect = () => {
     const [difficulty, setDifficulty] = useState(null);
     const render = () => {
         if (difficulty === null) {
             return (
-                <div>
-                    <button onClick={() => setDifficulty({ depth: 1, string: 'Easy' })}>Easy</button>
+                <div id="menu">
+                    <h1>Select Difficulty</h1>
+                    <button onClick={() => setDifficulty({ depth: 3, string: 'Easy' })}>Easy</button>
                     <button onClick={() => setDifficulty({ depth: 5, string: 'Medium' })}>Medium</button>
                     <button onClick={() => setDifficulty({ depth: 7, string: 'Hard' })}>Hard</button>
                 </div> 

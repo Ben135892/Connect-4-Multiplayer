@@ -17,7 +17,7 @@ const getPlayer = (players) => {
     return { _id: '' };
 }
 
-const Game = ({ game, setGame, players, setPlayers }) => {
+const Game = ({ game, setGame, players }) => {
     const player = getPlayer(players);
     const [gameOutcome, setGameOutcome] = useState(null);
     const [timer, setTimer] = useState(null);

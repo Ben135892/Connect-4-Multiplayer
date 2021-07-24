@@ -6,7 +6,7 @@ const BackButton = () => {
     if (location.pathname === '/')
         return null;
     return ( 
-        <button onClick={() => history.replace('/')}>Back to main menu</button> 
+        <button id="link" onClick={() => history.replace('/')}>Back to main menu...</button> 
     );
 }
  

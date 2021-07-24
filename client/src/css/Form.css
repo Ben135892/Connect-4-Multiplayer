@@ -3,3 +3,19 @@
     margin: auto;
     text-align: center;
 }
+
+.form label {
+    display: block;
+    padding: 0.5vw;
+    font-size: 1vw;
+}
+
+.form input {
+    width: 40%;
+    font-size: 1vw;
+    margin: 0.5vw auto;
+    display: block;
+    padding: 0.5vw;
+}
+
+

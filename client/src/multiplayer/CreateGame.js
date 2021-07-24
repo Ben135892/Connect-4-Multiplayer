@@ -20,7 +20,7 @@ const CreateGame = () => {
             <h1>Create Game</h1>
             <form onSubmit={onSubmit}>
                 <label htmlFor="nickName">Enter Nick Name</label>
-                <input onChange={onChange} type="text" id="nickName" />
+                <input autoComplete="off" onChange={onChange} type="text" id="nickName" />
                 <button>Submit</button>
             </form>
         </div>

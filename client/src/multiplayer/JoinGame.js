@@ -31,11 +31,11 @@ const JoinGame = () => {
         <div className="form">
             <h1>Join Game</h1>
             <form onSubmit={onSubmit}>
-                {error && <div>{error}</div>}
+                {error && <div class="error">{error}</div>}
                 <label htmlFor="nickName">Enter Nick Name</label>
-                <input value={nickName} onChange={onNameChange} type="text" id="nickName" />
+                <input autoComplete="off" value={nickName} onChange={onNameChange} type="text" id="nickName" />
                 <label htmlFor="gameID">Enter Room ID</label>
-                <input value={gameID} onChange={onIDChange} type="text" id="gameID" />
+                <input autoComplete="off" value={gameID} onChange={onIDChange} type="text" id="gameID" />
                 <button>Submit</button>
             </form>
         </div>

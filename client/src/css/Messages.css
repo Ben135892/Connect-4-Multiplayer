@@ -13,14 +13,14 @@
 
 #messages {
     text-align: left;
-    font-size: 1.3vw;
+    font-size: 1.2vw;
     max-height: 60vh;
     overflow-y: scroll;
     overflow-x: hidden;
 }
 
 #messages p {
-    margin: 1vw;
+    margin: 0.8vw;
 }
 
 #message-div label {
@@ -31,14 +31,14 @@
 #message-div input {
     border-radius: 1px;
     border: 1px solid black;
-    width: 70%;
-    margin: 0.1vw;
+    width: 90%;
+    margin: 0.5vw;
     padding: 0.3vw;
     font-size: 1vw;
 }
 
 #message-div button {
     border: 1px solid black;
-    padding: 0.3vw;
-    margin: 0.1vw;
+    padding: 0.4vw;
+    margin: 0.1vw auto;
 }

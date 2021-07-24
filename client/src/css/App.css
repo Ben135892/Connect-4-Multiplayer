@@ -11,3 +11,36 @@ h1 {
 h2 {
     font-size: 1.5vw;
 }
+
+button {
+    border-radius: 0.2vw;
+    border: 2px solid black;
+    padding: 0.7vw;
+    display: block;
+    margin: 2vw auto;
+    border: 2px solid black;
+    background-color: lightgray;
+}
+
+button:hover {
+    background-color: #C0C0C0;
+}
+
+#link {
+    color: blue;
+    text-decoration: none;
+    margin: 0;
+    border: none;
+    background-color: #EBECF0;
+    font-size: 1vw;
+}
+
+#link:hover {
+    cursor: pointer;
+}
+
+.error {
+    font-size: 1vw;
+    color: red;
+    margin: 1vw;
+}
