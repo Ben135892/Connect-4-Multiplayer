@@ -4,7 +4,7 @@ import '../css/Form.css'
 
 const JoinGame = () => {
     const [nickName, setNickName] = useState('');
-    const [gameID, setGameID] = useState('');
+    const [joinID, setJoinID] = useState('');
     const [error, setError] = useState(false);
     const [clicked, setClicked] = useState(false);
     useEffect(() => {
@@ -18,12 +18,12 @@ const JoinGame = () => {
         setNickName(e.target.value);
     }  
     const onIDChange = e => {
-        setGameID(e.target.value);
+        setJoinID(e.target.value);
     }
     const onSubmit = e => {
         e.preventDefault();
         setClicked(true);
-        socket.emit('join-game', { nickName, gameID });
+        socket.emit('join-game', { nickName, joinID });
     }
     if (clicked)
         return null;
@@ -35,7 +35,7 @@ const JoinGame = () => {
                 <label htmlFor="nickName">Enter Nick Name</label>
                 <input autoComplete="off" value={nickName} onChange={onNameChange} type="text" id="nickName" />
                 <label htmlFor="gameID">Enter Room ID</label>
-                <input autoComplete="off" value={gameID} onChange={onIDChange} type="text" id="gameID" />
+                <input autoComplete="off" value={joinID} onChange={onIDChange} type="text" id="gameID" />
                 <button>Submit</button>
             </form>
         </div>
