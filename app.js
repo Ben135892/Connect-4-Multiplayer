@@ -3,6 +3,7 @@ const app = express();
 const socketio = require('socket.io');
 const mongoose = require('mongoose');
 const path = require('path');
+const randomize = require('randomatic');
 
 const port = process.env.PORT || 3001;
 
@@ -84,6 +85,8 @@ io.on('connection', socket => {
             // create room
             const game = new Game({ players: [ player._id ] });
             game.turnTime = turnTime;
+            // give random join ID
+            game.joinID = randomize('A', 6);
             player.room = game._id;
             await player.save();
             await game.save();
@@ -100,14 +103,10 @@ io.on('connection', socket => {
         }
     });
 
-    socket.on('join-game', async ({ nickName, gameID }) => {
+    socket.on('join-game', async ({ nickName, joinID }) => {
         try {
-            // check if ID is valid
-            if (!mongoose.isValidObjectId(gameID)) {
-                socket.emit('error', 'Invalid Room ID');
-                return;
-            }
-            const game = await Game.findById(gameID);
+            console.log(joinID);
+            const game = await Game.findOne({ joinID });
             // check if game room exists
             if (game === null) {
                 socket.emit('error', 'Room does not exist');
@@ -129,6 +128,7 @@ io.on('connection', socket => {
             await player.save();
             await game.save();
 
+            const gameID = game._id.toString();
             const players = await getPlayers(game);
             socket.join(gameID);
 

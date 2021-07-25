@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const GameSchema = Schema({
+    joinID: { type: String },
     turn: { type: String },
     turnTime: { type: Number },
     hasStarted: {
