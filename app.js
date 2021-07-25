@@ -157,12 +157,12 @@ io.on('connection', socket => {
             const game = await Game.findById(gameID);
             // update game
             game.hasStarted = true;
-            game.turn = (Math.floor(Math.random() * 2) === 0) ? 'red' : 'yellow';
+            game.turn = Math.floor(Math.random() * 2) === 0 ? 'red' : 'yellow';
             await game.save();
 
             const player1 = await Player.findById(game.players[0]);
             const player2 = await Player.findById(game.players[1]);
-            player1.colour = (Math.floor(Math.random() * 2) === 0) ? 'red' : 'yellow';
+            player1.colour = Math.floor(Math.random() * 2) === 0 ? 'red' : 'yellow';
             player2.colour = player1.colour === 'red' ? 'yellow' : 'red';
             await player1.save();
             await player2.save();
