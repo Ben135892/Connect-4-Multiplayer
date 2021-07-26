@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import socket from './socketConfig';
-import '../css/Form.css'
+import socket from '../../socketConfig';
+import '../../css/Form.css'
 
 const CreateGame = () => {
     const [nickName, setNickName] = useState('');

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import socket from './socketConfig';
-import '../css/Messages.css';
+import socket from '../../socketConfig';
+import '../../css/Messages.css';
 
 const Messages = ({ gameID, nickName }) => {
     const messagesEndRef = useRef(null);

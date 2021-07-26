@@ -5,9 +5,7 @@ const BackButton = () => {
     const history = useHistory();
     if (location.pathname === '/')
         return null;
-    return ( 
-        <button id="link" onClick={() => history.replace('/')}>Back to main menu...</button> 
-    );
+    return <button id="link" onClick={() => history.replace('/')}>Back to main menu...</button>;
 }
  
 export default BackButton;

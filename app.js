@@ -30,6 +30,7 @@ mongoose.connect(db, {useNewUrlParser: true, useUnifiedTopology: true})
 
 const turnTime = 15; // how many seconds for each turn
 
+// return array of player objects
 const getPlayers = async (game) => {
     const players = [];
     for (let i = 0; i < game.players.length; i++) {
@@ -56,7 +57,7 @@ const leaveGame = async (socket) => {
             // if there are no players left, remove the game from the database
             await Game.findByIdAndDelete(game._id);
         } else {
-            // update the current host of the room?
+            // update the current host of the room
             const lastPlayer = await Player.findById(game.players[0]._id);
             lastPlayer.isHosting = true;
             await lastPlayer.save();
@@ -85,7 +86,8 @@ io.on('connection', socket => {
             // create room
             const game = new Game({ players: [ player._id ] });
             game.turnTime = turnTime;
-            // give random join ID
+
+            // create random join ID
             game.joinID = randomize('A', 6);
             player.room = game._id;
             await player.save();
@@ -105,14 +107,14 @@ io.on('connection', socket => {
 
     socket.on('join-game', async ({ nickName, joinID }) => {
         try {
-            console.log(joinID);
             const game = await Game.findOne({ joinID });
             // check if game room exists
             if (game === null) {
                 socket.emit('error', 'Room does not exist');
                 return;
             }
-            // check if game is open
+
+            // check if game is open (less than 2 players)
             if (game.players.length === 2) {
                 socket.emit('error', 'Room is full');
                 return;
@@ -130,13 +132,11 @@ io.on('connection', socket => {
 
             const gameID = game._id.toString();
             const players = await getPlayers(game);
-            socket.join(gameID);
+            socket.join(gameID);    
 
-            socket.emit('update-game-and-players', {game, players});
+            io.in(gameID).emit('update-game-and-players', {game, players});
             socket.emit('join-game');
-
             socket.broadcast.to(gameID).emit('message', nickName + ' has joined!');
-            socket.broadcast.to(gameID).emit('update-game-and-players', {game, players});
         }
         catch(err) {
             console.log(err);
@@ -155,17 +155,23 @@ io.on('connection', socket => {
     socket.on('start-game', async ({ gameID }) => {
         try {
             const game = await Game.findById(gameID);
-            // update game
-            game.hasStarted = true;
-            game.turn = Math.floor(Math.random() * 2) === 0 ? 'red' : 'yellow';
-            await game.save();
 
+            // update player colours 
             const player1 = await Player.findById(game.players[0]);
             const player2 = await Player.findById(game.players[1]);
             player1.colour = Math.floor(Math.random() * 2) === 0 ? 'red' : 'yellow';
             player2.colour = player1.colour === 'red' ? 'yellow' : 'red';
             await player1.save();
             await player2.save();
+
+            // update game
+            game.hasStarted = true;
+            game.turn = Math.floor(Math.random() * 2) === 0 ? 'red' : 'yellow';
+            // make sure turnID is unique
+            game.turnID++;
+            game.turnStartTime = new Date().getTime();
+            setTimeout(() => io.in(gameID).emit('make-move', { turnID: game.turnID }), 1000 * turnTime);
+            await game.save();
 
             const players = [player1, player2];
             io.in(gameID).emit('restart');
@@ -189,9 +195,12 @@ io.on('connection', socket => {
         try {
             const game = await Game.findById(gameID);
             game.turn = game.turn === 'red' ? 'yellow' : 'red';
+            game.turnID++;
+            game.turnStartTime = new Date().getTime();
+            setTimeout(() => io.in(gameID).emit('make-move', { turnID: game.turnID }), 1000 * turnTime);
             await game.save();
+
             io.in(gameID).emit('update-timer', turnTime);
-            // make sure timer is reset for client by emitting game back to client as well
             io.in(gameID).emit('update-game', game);
         }
         catch(err) {
@@ -206,7 +215,6 @@ io.on('connection', socket => {
             await game.save();
             socket.broadcast.to(gameID).emit('game-over', result);
             socket.broadcast.to(gameID).emit('update-game', game);
-            io.in(gameID).emit('remove-timer');
         }
         catch(err) {
             console.log(err);

@@ -1,5 +1,5 @@
-import hasWon from '../hasWon';
-import isDraw from '../isDraw';
+import hasWon from './hasWon';
+import isDraw from './isDraw';
 import possiblePositions from './possiblePositions';
 
 const minimax = (board, depth, alpha, beta, maximizingPlayer, aiColour, humanColour, width, height) => {

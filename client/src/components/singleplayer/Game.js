@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import StartButton from './StartButton';
 import Board from './Board';
-import '../css/SingleplayerGame.css';
+import '../../css/SingleplayerGame.css';
 
 const SinglePlayer = ({ difficulty, setDifficulty }) => {
     const [game, setGame] = useState({ hasStarted: false });

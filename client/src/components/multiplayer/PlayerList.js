@@ -1,4 +1,4 @@
-import '../css/PlayerList.css';
+import '../../css/PlayerList.css';
 
 const PlayerList = ({ playerID, players }) => {
     const renderPlayer = (player) => {

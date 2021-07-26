@@ -1,10 +1,23 @@
 import { useEffect, useState } from "react";
-import '../css/Board.css';
-import socket from './socketConfig'
-import hasWon from '../hasWon';
-import isDraw from '../isDraw';
+import '../../css/Board.css';
+import socket from '../../socketConfig'
+import hasWon from '../../hasWon';
+import isDraw from '../../isDraw';
 
-const Board = ({ game, setGame, player, setGameOutcome, timer, setTimer }) => {
+const randomMove = (board, width, height) => {
+    while (true) {
+        let row = height - 1;
+        const col = Math.floor(Math.random() * width);
+        while (row >= 0) {
+            if (board[col][row] === '') {
+                return { row, col };
+            }
+            row--;
+        }
+    }
+}
+
+const Board = ({ game, setGame, playerColour, setGameOutcome, setTimer, setIsTimerPaused }) => {
     const width = 7;
     const height = 6;
     const generateBoard = () => {
@@ -15,7 +28,6 @@ const Board = ({ game, setGame, player, setGameOutcome, timer, setTimer }) => {
         return matrix;
     };
     const [board, setBoard] = useState(generateBoard());
-    // run this code once
     useEffect(() => {
         socket.on('restart', () => {
             setGameOutcome(null);
@@ -32,46 +44,43 @@ const Board = ({ game, setGame, player, setGameOutcome, timer, setTimer }) => {
             socket.off('update-board');
         };
     }, [setGameOutcome]);
-    // runs whenever board is updated/rerendered
     useEffect(() => {
-        // if timer has ran out for players turn, make a random move
-        if (game.hasStarted && player.colour === game.turn && timer <= 0) {
-            while (true) {
-                let row = height - 1;
-                const column = Math.floor(Math.random() * width);
-                while (row >= 0) {
-                    if (board[column][row] === '') {
-                        makeMove(row, column);
-                        return;
-                    }
-                    row--;
-                }
+        // for forced move due to time running out. In this this case, make a random move
+        socket.on('make-move', ({ turnID }) => {
+            if (!game.hasStarted || turnID !== game.turnID || game.turn !== playerColour) {
+                return;
             }
-        }
-    });
+            const move = randomMove(board, width, height);
+            makeMove(move.row, move.col);
+        });
+        return () => socket.off('make-move');
+        // eslint-disable-next-line
+    }, [game, playerColour, board]);
     const makeMove = (row, colIndex) => {
-        board[colIndex][row] = player.colour;
+        board[colIndex][row] = playerColour;
         setBoard([...board]);
-        socket.emit('update-board', { gameID: game._id.toString(), row, col: colIndex, colour: player.colour });
+        const gameID = game._id.toString();
+        socket.emit('update-board', { gameID, row, col: colIndex, colour: playerColour });
         // turn over
-        if (hasWon(player.colour, board, width, height)) {
+        if (hasWon(playerColour, board, width, height)) {
             game.hasStarted = false;
             setGameOutcome('You won!');
-            socket.emit('game-over', { gameID: game._id.toString(), result: 'You lost!' });
+            socket.emit('game-over', { gameID, result: 'You lost!' });
         } else if (isDraw(board, width, height)) {
             game.hasStarted = false;
             setGameOutcome('Draw');
-            socket.emit('game-over', { gameID: game._id.toString(), result: 'Draw!' });
+            socket.emit('game-over', { gameID, result: 'Draw!' });
         }
         else {
             game.turn = game.turn === 'red' ? 'yellow' : 'red';
-            socket.emit('change-turn', { gameID: game._id.toString() });
+            socket.emit('change-turn', { gameID });
             setTimer(game.turnTime);
+            setIsTimerPaused(true); // don't want to update the timer until we are sent back the time for the next turn
         }
         setGame({ ...game });
     }
     const handleClick = (colIndex) => {
-        if (!game.hasStarted || game.turn !== player.colour)
+        if (!game.hasStarted || game.turn !== playerColour)
             return;
         let row = height - 1;
         while (row >= 0) {

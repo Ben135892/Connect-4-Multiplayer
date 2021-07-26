@@ -1,6 +1,6 @@
-import socket from './socketConfig';
+import socket from '../../socketConfig';
 import { useState } from 'react';
-import '../css/StartButton.css';
+import '../../css/StartButton.css';
 
 const StartButton = ({ gameID }) => {
     const [clicked, setClicked] = useState(false);

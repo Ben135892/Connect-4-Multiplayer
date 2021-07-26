@@ -1,4 +1,4 @@
-import './css/GameMenu.css';
+import '../css/GameMenu.css';
 
 const GameMenu = ({ history }) => {
     return (

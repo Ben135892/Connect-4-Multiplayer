@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import '../css/Board.css';
-import hasWon from '../hasWon';
-import isDraw from '../isDraw';
-import generateBoard from '../generateBoard';
-import possiblePositions from './possiblePositions';
-import minimax from './minimax';
+import '../../css/Board.css';
+import hasWon from '../../hasWon';
+import isDraw from '../../isDraw';
+import generateBoard from '../../generateBoard';
+import possiblePositions from '../../possiblePositions';
+import minimax from '../../minimax';
 
 const Board = ({ depth, game, setGame, playerColour, aiColour, setGameOutcome }) => {
     const width = 7;

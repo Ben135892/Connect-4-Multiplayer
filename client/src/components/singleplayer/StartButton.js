@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import '../css/StartButton.css';
+import '../../css/StartButton.css';
 
 const randomNum = () => Math.floor(Math.random() * 2); // random num between 0 and 1
 const oppositeColour = (colour) => colour === 'red' ? 'yellow' : 'red'; 

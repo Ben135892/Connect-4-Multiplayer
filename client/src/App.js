@@ -1,12 +1,12 @@
 import { Route, Switch, useHistory } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import GameMenu from './GameMenu';
-import CreateGame from './multiplayer/CreateGame';
-import JoinGame from './multiplayer/JoinGame';
-import MultiplayerGame from './multiplayer/Game';
-import DifficultySelect from './singleplayer/DifficultySelect';
-import BackButton from './BackButton';
-import socket from './multiplayer/socketConfig';
+import GameMenu from './components/GameMenu';
+import CreateGame from './components/multiplayer/CreateGame';
+import JoinGame from './components/multiplayer/JoinGame';
+import MultiplayerGame from './components/multiplayer/Game';
+import DifficultySelect from './components/singleplayer/DifficultySelect';
+import BackButton from './components/BackButton';
+import socket from './socketConfig';
 import './css/App.css'
 
 function App() {
