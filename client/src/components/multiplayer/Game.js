@@ -20,22 +20,8 @@ const getPlayer = (players) => {
 const Game = ({ game, setGame, players, setPlayers }) => {
     const player = getPlayer(players);
     const [gameOutcome, setGameOutcome] = useState(null);
-    const [timer, setTimer] = useState(null);
-    const [isTimerPaused, setIsTimerPaused] = useState(true);
     useEffect(() => {
-        socket.on('game-over', result => {
-            setGameOutcome(result);
-            setTimer(null);
-            setIsTimerPaused(true);
-        });
-        socket.on('update-timer', time => {
-            setTimer(time);
-            setIsTimerPaused(false);
-        });
-        socket.on('remove-timer', () => {
-            setTimer(null);
-            setIsTimerPaused(true);
-        });
+        socket.on('game-over', result => setGameOutcome(result));
         return () => {
             socket.off('game-over');
             socket.off('update-timer');
@@ -52,11 +38,11 @@ const Game = ({ game, setGame, players, setPlayers }) => {
         <div id="game">
             <h2>Game Code: {game.joinID}</h2>
             <GameInfo game={game} player={player} gameOutcome={gameOutcome} />
-            {timer !== null && <Timer timer={timer} setTimer={setTimer} isTimerPaused={isTimerPaused} turnID={game.turnID}/>}
+            {game.hasStarted && <Timer game={game} />}
             <div id="main">
                 <PlayerList playerID={player._id} players={players} />
-                <Board game={game} setGame={setGame} playerColour={player.colour} setGameOutcome={setGameOutcome} setTimer={setTimer} setIsTimerPaused={setIsTimerPaused}/>
-                <Messages gameID={game._id.toString()} nickName={player.nickName} />
+                <Board game={game} setGame={setGame} playerColour={player.colour} setGameOutcome={setGameOutcome} />
+                <Messages gameID={game._id} nickName={player.nickName} />
             </div>
         </div>
     );

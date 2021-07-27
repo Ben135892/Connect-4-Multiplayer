@@ -3,21 +3,9 @@ import '../../css/Board.css';
 import socket from '../../socketConfig'
 import hasWon from '../../hasWon';
 import isDraw from '../../isDraw';
+import randomMove from '../../randomMove';
 
-const randomMove = (board, width, height) => {
-    while (true) {
-        let row = height - 1;
-        const col = Math.floor(Math.random() * width);
-        while (row >= 0) {
-            if (board[col][row] === '') {
-                return { row, col };
-            }
-            row--;
-        }
-    }
-}
-
-const Board = ({ game, setGame, playerColour, setGameOutcome, setTimer, setIsTimerPaused }) => {
+const Board = ({ game, setGame, playerColour, setGameOutcome }) => {
     const width = 7;
     const height = 6;
     const generateBoard = () => {
@@ -54,58 +42,45 @@ const Board = ({ game, setGame, playerColour, setGameOutcome, setTimer, setIsTim
             makeMove(move.row, move.col);
         });
         return () => socket.off('make-move');
-        // eslint-disable-next-line
-    }, [game, playerColour, board]);
+    });
     const makeMove = (row, colIndex) => {
         board[colIndex][row] = playerColour;
         setBoard([...board]);
-        const gameID = game._id.toString();
-        socket.emit('update-board', { gameID, row, col: colIndex, colour: playerColour });
+        socket.emit('update-board', { gameID: game._id, row, col: colIndex, colour: playerColour });
         // turn over
         if (hasWon(playerColour, board, width, height)) {
             game.hasStarted = false;
             setGameOutcome('You won!');
-            setTimer(null);
-            socket.emit('game-over', { gameID, result: 'You lost!' });
+            socket.emit('game-over', { gameID: game._id, result: 'You lost!' });
         } else if (isDraw(board, width, height)) {
             game.hasStarted = false;
             setGameOutcome('Draw');
-            setTimer(null);
-            socket.emit('game-over', { gameID, result: 'Draw!' });
+            socket.emit('game-over', { gameID: game._id, result: 'Draw!' });
         }
         else {
             game.turn = game.turn === 'red' ? 'yellow' : 'red';
-            socket.emit('change-turn', { gameID });
-            setTimer(game.turnTime);
+            socket.emit('change-turn', { gameID: game._id });
         }
-        setIsTimerPaused(true); 
         setGame({ ...game });
     }
-    const handleClick = (colIndex) => {
+    const handleClick = (col) => {
         if (!game.hasStarted || game.turn !== playerColour)
             return;
         let row = height - 1;
         while (row >= 0) {
-            if (board[colIndex][row] === '') {
-                makeMove(row, colIndex);
+            if (board[col][row] === '') {
+                makeMove(row, col);
                 return;
             }
             row--;
         }
     }
-    const renderCell = (cell, colIndex, rowIndex) => {
-        if (cell !== '') {
-            return <div className={'cell ' + cell} key={colIndex + ',' + rowIndex}></div>
-        } else {
-            return <div className='cell' key={colIndex + ',' + rowIndex}></div>
-        }
-    }
     return (
         <div id='board'>
-            {board.map((currentCol, colIndex) => 
-                <div className='col' onClick={() => handleClick(colIndex)} key={colIndex}>
-                    {board[colIndex].map((cell, rowIndex) => 
-                        renderCell(cell, colIndex, rowIndex)
+            {board.map((currentCol, col) => 
+                <div className='col' onClick={() => handleClick(col)} key={col}>
+                    {board[col].map((cell, row) => 
+                        <div className={'cell ' + cell} key={col + ',' + row}></div>
                     )}
                 </div>
             )}

@@ -28,7 +28,7 @@ const db = process.env.CONNECTION_STRING;
 mongoose.connect(db, {useNewUrlParser: true, useUnifiedTopology: true})
 .catch(err => console.log(err));
 
-const turnTime = 15; // how many seconds for each turn
+const turnTime = 5; // how many seconds for each turn
 
 // return array of player objects
 const getPlayers = async (game) => {
@@ -65,7 +65,6 @@ const leaveGame = async (socket) => {
             
             socket.leave(gameID);
             io.in(gameID).emit('update-game-and-players', {game, players: playerArray});
-            io.in(gameID).emit('remove-timer');
             io.in(gameID).emit('message', player.nickName + ' has left!');
             await game.save();
         }     
@@ -172,11 +171,9 @@ io.on('connection', socket => {
             game.turnID++;
             await game.save();
 
-            game.turnStartTime = new Date().getTime();
             const players = [player1, player2];
             io.in(gameID).emit('restart');
             io.in(gameID).emit('update-game-and-players', {game, players});
-            io.in(gameID).emit('update-timer', turnTime);
             setTimeout(() => io.in(gameID).emit('make-move', { turnID: game.turnID }), 1000 * turnTime);
         } catch(err) {
             console.log(err)
@@ -199,9 +196,7 @@ io.on('connection', socket => {
             game.turnID++;
             await game.save();
 
-            game.turnStartTime = new Date().getTime();
             io.in(gameID).emit('update-game', game);
-            io.in(gameID).emit('update-timer', turnTime);
             setTimeout(() => io.in(gameID).emit('make-move', { turnID: game.turnID }), 1000 * turnTime);
         }
         catch(err) {

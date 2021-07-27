@@ -3,7 +3,7 @@ const { Schema } = mongoose;
 
 const PlayerSchema = Schema({
     socketID: {type: String},
-    colour: {type: String, default:''},
+    colour: {type: String, default: ''},
     isHosting: {
         type: Boolean,
         default: false
