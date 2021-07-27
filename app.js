@@ -65,6 +65,7 @@ const leaveGame = async (socket) => {
             
             socket.leave(gameID);
             io.in(gameID).emit('update-game-and-players', {game, players: playerArray});
+            io.in(gameID).emit('remove-timer');
             io.in(gameID).emit('message', player.nickName + ' has left!');
             await game.save();
         }     
@@ -169,14 +170,14 @@ io.on('connection', socket => {
             game.turn = Math.floor(Math.random() * 2) === 0 ? 'red' : 'yellow';
             // make sure turnID is unique
             game.turnID++;
-            game.turnStartTime = new Date().getTime();
-            setTimeout(() => io.in(gameID).emit('make-move', { turnID: game.turnID }), 1000 * turnTime);
             await game.save();
 
+            game.turnStartTime = new Date().getTime();
             const players = [player1, player2];
             io.in(gameID).emit('restart');
-            io.in(gameID).emit('update-timer', turnTime);
             io.in(gameID).emit('update-game-and-players', {game, players});
+            io.in(gameID).emit('update-timer', turnTime);
+            setTimeout(() => io.in(gameID).emit('make-move', { turnID: game.turnID }), 1000 * turnTime);
         } catch(err) {
             console.log(err)
         }
@@ -196,12 +197,12 @@ io.on('connection', socket => {
             const game = await Game.findById(gameID);
             game.turn = game.turn === 'red' ? 'yellow' : 'red';
             game.turnID++;
-            game.turnStartTime = new Date().getTime();
-            setTimeout(() => io.in(gameID).emit('make-move', { turnID: game.turnID }), 1000 * turnTime);
             await game.save();
 
-            io.in(gameID).emit('update-timer', turnTime);
+            game.turnStartTime = new Date().getTime();
             io.in(gameID).emit('update-game', game);
+            io.in(gameID).emit('update-timer', turnTime);
+            setTimeout(() => io.in(gameID).emit('make-move', { turnID: game.turnID }), 1000 * turnTime);
         }
         catch(err) {
             console.log(err);

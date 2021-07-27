@@ -17,32 +17,42 @@ const getPlayer = (players) => {
     return { _id: '' };
 }
 
-const Game = ({ game, setGame, players }) => {
+const Game = ({ game, setGame, players, setPlayers }) => {
     const player = getPlayer(players);
     const [gameOutcome, setGameOutcome] = useState(null);
     const [timer, setTimer] = useState(null);
-    const [isTimerPaused, setIsTimerPaused] = useState(false);
+    const [isTimerPaused, setIsTimerPaused] = useState(true);
     useEffect(() => {
-        socket.on('game-over', result => setGameOutcome(result));
+        socket.on('game-over', result => {
+            setGameOutcome(result);
+            setTimer(null);
+            setIsTimerPaused(true);
+        });
         socket.on('update-timer', time => {
             setTimer(time);
             setIsTimerPaused(false);
         });
+        socket.on('remove-timer', () => {
+            setTimer(null);
+            setIsTimerPaused(true);
+        })
         return () => {
             socket.off('game-over');
             socket.off('update-timer');
             if (player._id !== '') {
                 socket.emit('leave-game');
+                setGame({});
+                setPlayers([]);
             } 
         }
-    }, [player._id]);
+    }, [player._id, setGame, setPlayers]);
     if (player._id === '')
         return <Redirect to="/" />;
     return (
         <div id="game">
             <h2>Game Code: {game.joinID}</h2>
             <GameInfo game={game} player={player} gameOutcome={gameOutcome} />
-            {game.hasStarted && <Timer timer={timer} setTimer={setTimer} isTimerPaused={isTimerPaused} startTime={game.turnStartTime} />}
+            {timer !== null && <Timer timer={timer} setTimer={setTimer} isTimerPaused={isTimerPaused} startTime={game.turnStartTime} />}
             <div id="main">
                 <PlayerList playerID={player._id} players={players} />
                 <Board game={game} setGame={setGame} playerColour={player.colour} setGameOutcome={setGameOutcome} setTimer={setTimer} setIsTimerPaused={setIsTimerPaused}/>

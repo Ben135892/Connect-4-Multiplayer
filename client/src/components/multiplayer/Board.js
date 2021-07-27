@@ -65,10 +65,12 @@ const Board = ({ game, setGame, playerColour, setGameOutcome, setTimer, setIsTim
         if (hasWon(playerColour, board, width, height)) {
             game.hasStarted = false;
             setGameOutcome('You won!');
+            setTimer(null);
             socket.emit('game-over', { gameID, result: 'You lost!' });
         } else if (isDraw(board, width, height)) {
             game.hasStarted = false;
             setGameOutcome('Draw');
+            setTimer(null);
             socket.emit('game-over', { gameID, result: 'Draw!' });
         }
         else {
