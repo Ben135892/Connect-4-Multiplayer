@@ -77,8 +77,8 @@ const Board = ({ game, setGame, playerColour, setGameOutcome, setTimer, setIsTim
             game.turn = game.turn === 'red' ? 'yellow' : 'red';
             socket.emit('change-turn', { gameID });
             setTimer(game.turnTime);
-            setIsTimerPaused(true); // don't want to update the timer until we are sent back the time for the next turn
         }
+        setIsTimerPaused(true); 
         setGame({ ...game });
     }
     const handleClick = (colIndex) => {

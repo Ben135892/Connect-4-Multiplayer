@@ -7,7 +7,7 @@ import MultiplayerGame from './components/multiplayer/Game';
 import DifficultySelect from './components/singleplayer/DifficultySelect';
 import BackButton from './components/BackButton';
 import socket from './socketConfig';
-import './css/App.css'
+import './css/App.css';
 
 function App() {
     const history = useHistory();

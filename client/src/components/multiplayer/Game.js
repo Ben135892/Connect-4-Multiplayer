@@ -35,7 +35,7 @@ const Game = ({ game, setGame, players, setPlayers }) => {
         socket.on('remove-timer', () => {
             setTimer(null);
             setIsTimerPaused(true);
-        })
+        });
         return () => {
             socket.off('game-over');
             socket.off('update-timer');
@@ -52,7 +52,7 @@ const Game = ({ game, setGame, players, setPlayers }) => {
         <div id="game">
             <h2>Game Code: {game.joinID}</h2>
             <GameInfo game={game} player={player} gameOutcome={gameOutcome} />
-            {timer !== null && <Timer timer={timer} setTimer={setTimer} isTimerPaused={isTimerPaused} startTime={game.turnStartTime} />}
+            {timer !== null && <Timer timer={timer} setTimer={setTimer} isTimerPaused={isTimerPaused} turnID={game.turnID}/>}
             <div id="main">
                 <PlayerList playerID={player._id} players={players} />
                 <Board game={game} setGame={setGame} playerColour={player.colour} setGameOutcome={setGameOutcome} setTimer={setTimer} setIsTimerPaused={setIsTimerPaused}/>
