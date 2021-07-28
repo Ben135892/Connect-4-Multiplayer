@@ -3,31 +3,15 @@ import '../../css/Board.css';
 import hasWon from '../../hasWon';
 import isDraw from '../../isDraw';
 import generateBoard from '../../generateBoard';
-import possiblePositions from '../../possiblePositions';
-import minimax from '../../minimax';
+import aiMove from '../../aiMove';
 
-const Board = ({ depth, game, setGame, playerColour, aiColour, setGameOutcome }) => {
+const oppositeColour = (colour) => colour === 'red' ? 'yellow' : 'red'; 
+
+const Board = ({ depth, game, setGame, playerColour, setGameOutcome }) => {
+    const aiColour = oppositeColour(playerColour);
     const width = 7;
     const height = 6;
     const [board, setBoard] = useState(generateBoard(width, height));
-    const aiMove = () => {
-        let max = -Infinity;
-        let bestMove;
-        let alpha = -Infinity, beta = Infinity;
-        const positions = possiblePositions(board);
-        for (let i = 0; i < positions.length; i++) {
-            board[positions[i].x][positions[i].y] = aiColour;
-            const value = minimax(board, depth - 1, alpha, beta, false, aiColour, playerColour, width, height);
-            if (value > max) {
-                max = value;
-                bestMove = positions[i];
-            }
-            alpha = Math.max(alpha, value);
-            // undo the move
-            board[positions[i].x][positions[i].y] = '';
-        }
-        makeMove(aiColour, bestMove.y, bestMove.x);
-    }
     useEffect(() => {
         if (game.hasStarted) {
             setBoard(generateBoard(width, height));
@@ -35,12 +19,13 @@ const Board = ({ depth, game, setGame, playerColour, aiColour, setGameOutcome })
     }, [game.hasStarted]);
     useEffect(() => {
         if (game.hasStarted && game.turn === aiColour) {
-            aiMove();
+            const bestMove = aiMove(board, depth, width, height, aiColour, playerColour);
+            makeMove(aiColour, bestMove.row, bestMove.col);
         }
         // eslint-disable-next-line
     }, [board]);
-    const makeMove = async (colour, row, colIndex) => {
-        board[colIndex][row] = colour;
+    const makeMove = (colour, row, col) => {
+        board[col][row] = colour;
         setBoard([...board]);
         // turn over
         if (hasWon(colour, board, width, height)) {
@@ -53,37 +38,29 @@ const Board = ({ depth, game, setGame, playerColour, aiColour, setGameOutcome })
         } else if (isDraw(board, width, height)) {
             game.hasStarted = false;
             setGameOutcome('Draw');
-        }
-        else {
+        } else {
             game.turn = game.turn === 'red' ? 'yellow' : 'red';
         }
         setGame({ ...game });
     }
-    const handleClick = (colIndex) => {
+    const handleClick = (col) => {
         if (!game.hasStarted || game.turn !== playerColour)
             return;
         let row = height - 1;
         while (row >= 0) {
-            if (board[colIndex][row] === '') {
-                makeMove(playerColour, row, colIndex);
+            if (board[col][row] === '') {
+                makeMove(playerColour, row, col);
                 return;
             }
             row--;
         }
     }
-    const renderCell = (cell, colIndex, rowIndex) => {
-        if (cell !== '') {
-            return <div className={'cell ' + cell} key={colIndex + ',' + rowIndex}></div>
-        } else {
-            return <div className='cell' key={colIndex + ',' + rowIndex}></div>
-        }
-    }
     return (
         <div id='board'>
-            {board.map((currentCol, colIndex) => 
-                <div className='col' onClick={() => handleClick(colIndex)} key={colIndex}>
-                    {board[colIndex].map((cell, rowIndex) => 
-                        renderCell(cell, colIndex, rowIndex)
+            {board.map((currentCol, col) => 
+                <div className='col' onClick={() => handleClick(col)} key={col}>
+                    {board[col].map((cell, row) => 
+                        <div className={'cell ' + cell} key={col + ',' + row}></div>
                     )}
                 </div>
             )}

@@ -2,6 +2,8 @@ import hasWon from './hasWon';
 import isDraw from './isDraw';
 import possiblePositions from './possiblePositions';
 
+// https://en.wikipedia.org/wiki/Minimax
+
 const minimax = (board, depth, alpha, beta, maximizingPlayer, aiColour, humanColour, width, height) => {
     if (hasWon(aiColour, board, width, height)) {
         return 1000 + depth;
@@ -13,7 +15,7 @@ const minimax = (board, depth, alpha, beta, maximizingPlayer, aiColour, humanCol
         // randomness
         return Math.floor(Math.random() * 200) - 100;
     }
-    const positions = possiblePositions(board);
+    const positions = possiblePositions(board, width, height);
     if (maximizingPlayer) {
         let max = -Infinity;
         for (let i = 0; i < positions.length; i++) {

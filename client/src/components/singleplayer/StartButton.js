@@ -2,14 +2,12 @@ import { useState } from 'react';
 import '../../css/StartButton.css';
 
 const randomNum = () => Math.floor(Math.random() * 2); // random num between 0 and 1
-const oppositeColour = (colour) => colour === 'red' ? 'yellow' : 'red'; 
 
-const StartButton = ({ game, setGame, setYourColour, setAiColour, setGameOutcome }) => {
+const StartButton = ({ game, setGame, setPlayerColour, setGameOutcome }) => {
     const [clicked, setClicked] = useState(false);
     const start = () => {
-        const yourColour = randomNum() === 0 ? 'red' : 'yellow';
-        setYourColour(yourColour);
-        setAiColour(oppositeColour(yourColour));
+        const playerColour = randomNum() === 0 ? 'red' : 'yellow';
+        setPlayerColour(playerColour);
         game.hasStarted = true;
         game.turn = randomNum() === 0 ? 'red' : 'yellow';
         setGame({...game});

@@ -32,15 +32,16 @@ const Board = ({ game, setGame, playerColour, setGameOutcome }) => {
             socket.off('update-board');
         };
     }, [setGameOutcome]);
+    const forcedMove = (turnID) => {
+        if (!game.hasStarted || turnID !== game.turnID || game.turn !== playerColour) {
+            return;
+        }
+        const move = randomMove(board, width, height);
+        makeMove(move.row, move.col);
+    }
     useEffect(() => {
         // for forced move due to time running out. In this this case, make a random move
-        socket.on('make-move', ({ turnID }) => {
-            if (!game.hasStarted || turnID !== game.turnID || game.turn !== playerColour) {
-                return;
-            }
-            const move = randomMove(board, width, height);
-            makeMove(move.row, move.col);
-        });
+        socket.on('make-move', ({ turnID }) => forcedMove(turnID));
         return () => socket.off('make-move');
     });
     const makeMove = (row, colIndex) => {
