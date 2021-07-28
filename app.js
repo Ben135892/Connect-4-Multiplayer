@@ -28,7 +28,7 @@ const db = process.env.CONNECTION_STRING;
 mongoose.connect(db, {useNewUrlParser: true, useUnifiedTopology: true})
 .catch(err => console.log(err));
 
-const turnTime = 5; // how many seconds for each turn
+const turnTime = 15; // how many seconds for each turn
 
 // return array of player objects
 const getPlayers = async (game) => {
