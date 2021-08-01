@@ -17,8 +17,8 @@ function App() {
         socket.on('update-game', game => setGame(game));
         socket.on('update-players', players => setPlayers(players));
         socket.on('update-game-and-players', ({ game, players }) => {
-            setGame(game);
             setPlayers(players);
+            setGame(game);
         });
         socket.on('join-game', () => history.replace('/game/play'));
     }, [history]);

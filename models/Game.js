@@ -2,10 +2,13 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const GameSchema = Schema({
-    joinID: { type: String },
-    turn: { type: String },
+    _id: { type: String},
+    turn: { type: String }, // red or yellow
     turnTime: { type: Number },
-    turnID: { type: Number, default: 0 },
+    turnID: { 
+        type: Number, 
+        default: 0 
+    },
     hasStarted: {
         type: Boolean,
         default: false

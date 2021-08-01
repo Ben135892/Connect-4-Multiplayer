@@ -19,8 +19,11 @@ const Board = ({ depth, game, setGame, playerColour, setGameOutcome }) => {
     }, [game.hasStarted]);
     useEffect(() => {
         if (game.hasStarted && game.turn === aiColour) {
-            const bestMove = aiMove(board, depth, width, height, aiColour, playerColour);
-            makeMove(aiColour, bestMove.row, bestMove.col);
+            const interval = 500 + Math.random() * 500; // ai should make turn after user after a certain time with a bit of randomness
+            setTimeout(() => {
+                const bestMove = aiMove(board, depth, width, height, aiColour, playerColour);
+                makeMove(aiColour, bestMove.row, bestMove.col);
+            }, interval);
         }
         // eslint-disable-next-line
     }, [board]);

@@ -44,23 +44,22 @@ const Board = ({ game, setGame, playerColour, setGameOutcome }) => {
         socket.on('make-move', ({ turnID }) => forcedMove(turnID));
         return () => socket.off('make-move');
     });
-    const makeMove = (row, colIndex) => {
-        board[colIndex][row] = playerColour;
+    const makeMove = (row, col) => {
+        board[col][row] = playerColour;
         setBoard([...board]);
-        socket.emit('update-board', { gameID: game._id, row, col: colIndex, colour: playerColour });
         // turn over
         if (hasWon(playerColour, board, width, height)) {
             game.hasStarted = false;
             setGameOutcome('You won!');
-            socket.emit('game-over', { gameID: game._id, result: 'You lost!' });
+            socket.emit('game-over-and-update-board', { gameID: game._id, result: 'You lost!', row, col, colour: playerColour });
         } else if (isDraw(board, width, height)) {
             game.hasStarted = false;
             setGameOutcome('Draw');
-            socket.emit('game-over', { gameID: game._id, result: 'Draw!' });
+            socket.emit('game-over-and-update-board', { gameID: game._id, result: 'Draw!', row, col, colour: playerColour });
         }
         else {
             game.turn = game.turn === 'red' ? 'yellow' : 'red';
-            socket.emit('change-turn', { gameID: game._id });
+            socket.emit('change-turn-and-board', { gameID: game._id, row, col, colour: playerColour });
         }
         setGame({ ...game });
     }

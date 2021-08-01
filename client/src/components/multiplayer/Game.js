@@ -36,7 +36,7 @@ const Game = ({ game, setGame, players, setPlayers }) => {
         return <Redirect to="/" />;
     return (
         <div id="game">
-            <h2>Game Code: {game.joinID}</h2>
+            <h2>Game Code: {game._id}</h2>
             <GameInfo game={game} player={player} gameOutcome={gameOutcome} />
             {game.hasStarted && <Timer game={game} />}
             <div id="main">

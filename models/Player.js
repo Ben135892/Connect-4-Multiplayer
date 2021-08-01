@@ -2,8 +2,11 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const PlayerSchema = Schema({
-    socketID: {type: String},
-    colour: {type: String, default: ''},
+    socketID: { type: String },
+    colour: {
+        type: String, 
+        default: ''
+    },
     isHosting: {
         type: Boolean,
         default: false
@@ -12,8 +15,7 @@ const PlayerSchema = Schema({
         type: String
     },
     room: {
-        type: Schema.Types.ObjectId,
-        ref: 'Game'
+        type: String
     }
 });
 

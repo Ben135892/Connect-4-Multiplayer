@@ -47,7 +47,7 @@ const leaveGame = async (socket) => {
         if (player === null)
             return;
 
-        const gameID = player.room.toString();
+        const gameID = player.room;
         await Player.findByIdAndDelete(player._id);
         const game = await Game.findById(player.room);
         game.players.remove(player._id);
@@ -87,16 +87,14 @@ io.on('connection', socket => {
             const game = new Game({ players: [ player._id ] });
             game.turnTime = turnTime;
 
-            // create random join ID
-            game.joinID = randomize('A', 6);
+            // create random game ID
+            game._id = randomize('A', 6);
             player.room = game._id;
             await player.save();
             await game.save();
             
             const players = [ player ];
-            const gameID = game._id.toString();
-            socket.join(gameID);
-
+            socket.join(game._id);
             socket.emit('update-game-and-players', {game, players});
             socket.emit('join-game');
         }
@@ -105,9 +103,9 @@ io.on('connection', socket => {
         }
     });
 
-    socket.on('join-game', async ({ nickName, joinID }) => {
+    socket.on('join-game', async ({ nickName, gameID }) => {
         try {
-            const game = await Game.findOne({ joinID });
+            const game = await Game.findById(gameID);
             // check if game room exists
             if (game === null) {
                 socket.emit('error', 'Room does not exist');
@@ -130,13 +128,12 @@ io.on('connection', socket => {
             await player.save();
             await game.save();
 
-            const gameID = game._id.toString();
             const players = await getPlayers(game);
-            socket.join(gameID);    
+            socket.join(game._id);    
 
-            io.in(gameID).emit('update-game-and-players', {game, players});
+            io.in(game._id).emit('update-game-and-players', {game, players});
             socket.emit('join-game');
-            socket.broadcast.to(gameID).emit('message', nickName + ' has joined!');
+            socket.broadcast.to(game._id).emit('message', nickName + ' has joined!');
         }
         catch(err) {
             console.log(err);
@@ -170,7 +167,7 @@ io.on('connection', socket => {
             // make sure turnID is unique
             game.turnID++;
             await game.save();
-
+        
             const players = [player1, player2];
             io.in(gameID).emit('restart');
             io.in(gameID).emit('update-game-and-players', {game, players});
@@ -180,22 +177,15 @@ io.on('connection', socket => {
         }
     });
 
-    socket.on('update-board', async ({ gameID, row, col, colour }) => {
+    socket.on('change-turn-and-board', async ({ gameID, row, col, colour }) => {
         try {
-            socket.broadcast.to(gameID).emit('update-board', { row, col, colour });
-        }
-        catch(err) {
-            console.log(err);
-        }
-    });
-
-    socket.on('change-turn', async ({ gameID }) => {
-        try {
+            console.log(typeof gameID);
             const game = await Game.findById(gameID);
             game.turn = game.turn === 'red' ? 'yellow' : 'red';
             game.turnID++;
             await game.save();
 
+            socket.broadcast.to(gameID).emit('update-board', { row, col, colour });
             io.in(gameID).emit('update-game', game);
             setTimeout(() => io.in(gameID).emit('make-move', { turnID: game.turnID }), 1000 * turnTime);
         }
@@ -204,11 +194,13 @@ io.on('connection', socket => {
         }
     });
 
-    socket.on('game-over', async ({ gameID, result }) => {
+    socket.on('game-over-and-update-board', async ({ gameID, result, row, col, colour }) => {
         try {
             const game = await Game.findById(gameID);
             game.hasStarted = false;
             await game.save();
+
+            socket.broadcast.to(gameID).emit('update-board', { row, col, colour });
             socket.broadcast.to(gameID).emit('game-over', result);
             socket.broadcast.to(gameID).emit('update-game', game);
         }
