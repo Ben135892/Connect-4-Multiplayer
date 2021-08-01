@@ -24,7 +24,7 @@ const Board = ({ game, setGame, playerColour, setGameOutcome }) => {
         socket.on('update-board', ({ row, col, colour }) => {
             setBoard(board => {
                 board[col][row] = colour;
-                return board;
+                return [...board];
             });
         });
         return () => {
