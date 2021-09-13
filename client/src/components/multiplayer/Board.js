@@ -4,17 +4,11 @@ import socket from '../../socketConfig'
 import hasWon from '../../hasWon';
 import isDraw from '../../isDraw';
 import randomMove from '../../randomMove';
+import generateBoard from '../../generateBoard';
+const width = 7;
+const height = 6;
 
 const Board = ({ game, setGame, playerColour, setGameOutcome }) => {
-    const width = 7;
-    const height = 6;
-    const generateBoard = () => {
-        const matrix = new Array(width);
-        for (let i = 0; i < width; i++) {
-            matrix[i] = new Array(height).fill('');
-        }
-        return matrix;
-    };
     const [board, setBoard] = useState(generateBoard());
     useEffect(() => {
         socket.on('restart', () => {
